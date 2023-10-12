@@ -58,10 +58,6 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 			log.Fatalf("error: %v", err)
 		}
 
-		fmt.Printf("--- m:\n%v\n\n", urls)
-
-		// fmt.Println("url #1:", urls[0], urls[0].Path, urls[0].url)
-
 		fmt.Fprintf(w, "You have reached %v", r.URL.Path)
 	}, nil
 }

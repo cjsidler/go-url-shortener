@@ -1,7 +1,11 @@
 package urlshortener
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+
+	"gopkg.in/yaml.v3"
 )
 
 // MapHandler will return an http.HandlerFunc (which also
@@ -39,7 +43,25 @@ func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 //
 // See MapHandler to create a similar http.HandlerFunc via
 // a mapping of paths to urls.
+
+type YAMLUrl struct {
+	Path string
+	Url  string
+}
+
 func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
-	// TODO: Implement this...
-	return nil, nil
+	return func(w http.ResponseWriter, r *http.Request) {
+		urls := make([]YAMLUrl, 0)
+
+		err := yaml.Unmarshal(yml, &urls)
+		if err != nil {
+			log.Fatalf("error: %v", err)
+		}
+
+		fmt.Printf("--- m:\n%v\n\n", urls)
+
+		// fmt.Println("url #1:", urls[0], urls[0].Path, urls[0].url)
+
+		fmt.Fprintf(w, "You have reached %v", r.URL.Path)
+	}, nil
 }

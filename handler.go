@@ -1,8 +1,6 @@
 package urlshortener
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 
 	"gopkg.in/yaml.v3"
@@ -50,14 +48,31 @@ type YAMLUrl struct {
 }
 
 func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		urls := make([]YAMLUrl, 0)
+	parsedYaml, err := parseYAML(yml)
+	if err != nil {
+		return nil, err
+	}
+	pathMap := buildMap(parsedYaml)
+	return MapHandler(pathMap, fallback), nil
+}
 
-		err := yaml.Unmarshal(yml, &urls)
-		if err != nil {
-			log.Fatalf("error: %v", err)
-		}
+func parseYAML(yml []byte) ([]YAMLUrl, error) {
+	yamlUrls := make([]YAMLUrl, 0)
 
-		fmt.Fprintf(w, "You have reached %v", r.URL.Path)
-	}, nil
+	err := yaml.Unmarshal(yml, &yamlUrls)
+	if err != nil {
+		return nil, err
+	}
+
+	return yamlUrls, nil
+}
+
+func buildMap(yamlUrls []YAMLUrl) map[string]string {
+	m := make(map[string]string)
+
+	for _, url := range yamlUrls {
+		m[url.Path] = url.Url
+	}
+
+	return m
 }

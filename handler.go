@@ -57,7 +57,7 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 }
 
 func parseYAML(yml []byte) ([]YAMLUrl, error) {
-	yamlUrls := make([]YAMLUrl, 0)
+	var yamlUrls []YAMLUrl
 
 	err := yaml.Unmarshal(yml, &yamlUrls)
 	if err != nil {
